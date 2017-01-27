@@ -65,7 +65,7 @@ InputMethod::~InputMethod()
 }
 
 
-void 
+void
 InputMethod::init()
 {
   DEBUG_TRACEFUNC();
@@ -89,8 +89,8 @@ InputMethod::init()
   qDebug("COMPOUND_TEXT: %lu", _compound_text);
   _kimera_atom = XInternAtom(qt_xdisplay(), "KIMERA_ATOM", False);
   qDebug("KIMERA_ATOM: %lu", _kimera_atom);
- 
-  // Set Selection XIM_SERVER Atom (@im=kimera)  
+
+  // Set Selection XIM_SERVER Atom (@im=kimera)
   XSetSelectionOwner(qt_xdisplay(), _server_atom, winId(), 0);
   Q_ASSERT(XGetSelectionOwner(qt_xdisplay(), _server_atom) == winId());
 }
@@ -105,13 +105,13 @@ InputMethod::currentXIMStyle() const
 
 void
 InputMethod::sendPreeditString(int caret, const QStringList& strlst, int attention_idx)
-{ 
+{
   DEBUG_TRACEFUNC();
   if (!_crnt_im || !_crnt_ic) {
     // Do nothing
     return;
   }
-  
+
   QByteArray  feedback;
   QDataStream ds(feedback, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
@@ -148,7 +148,7 @@ InputMethod::recvXIMError()
   QByteArray buf = _buffer->buffer();   // received data
   QDataStream dsbuf(buf, IO_ReadOnly);
   dsbuf.setByteOrder(sysByteOrder());
-  
+
   char unused[4];
   u_int16_t im, ic, flag, errcode, errlen, errtype;
   dsbuf.readRawBytes((char*)unused, 4);   // header
@@ -170,29 +170,29 @@ InputMethod::recvXIMGetIMValues() const
   QByteArray buf = _buffer->buffer();   // received data
   QDataStream dsbuf(buf, IO_ReadOnly);
   dsbuf.setByteOrder(sysByteOrder());
-  
+
   char unused[4];
   u_int16_t im, n;
   dsbuf.readRawBytes((char*)unused, 4);   // header
   dsbuf >> im >> n;
-  
+
   QByteArray listximattr;   // reply LISTofXICATTRIBUTE
   QDataStream dsxim(listximattr, IO_WriteOnly);
   dsxim.setByteOrder(sysByteOrder());
-  
+
   u_int16_t id;
   dsbuf >> id;
   Q_ASSERT(n == 2 && id == 0);
-  qDebug("Get IM values request IM:%d id:%d", im, id);  
+  qDebug("Get IM values request IM:%d id:%d", im, id);
   QByteArray ba(_xim->queryInputStyle());
   dsxim << id << (u_int16_t)ba.size();
   dsxim.writeRawBytes(ba.data(), ba.size());
-  for (int j = 0; j < pad(ba.size()); j++) 
-    dsxim << (u_int8_t)0;  
+  for (int j = 0; j < pad(ba.size()); j++)
+    dsxim << (u_int8_t)0;
 
   QByteArray data;         // reply data
   QDataStream ds(data, IO_WriteOnly);
-  ds.setByteOrder(sysByteOrder()); 
+  ds.setByteOrder(sysByteOrder());
 
   ds << (u_int8_t)XIM_GET_IM_VALUES_REPLY << (u_int8_t)0 << numElements(4 + listximattr.size())
      << im << (u_int16_t)listximattr.size();
@@ -210,16 +210,16 @@ InputMethod::recvXIMSetICFocus()
   QByteArray buf = _buffer->buffer();   // received data
   QDataStream dsbuf(buf, IO_ReadOnly);
   dsbuf.setByteOrder(sysByteOrder());
-  
+
   char unused[4];
   dsbuf.readRawBytes((char*)unused, 4);   // header
   dsbuf >> _crnt_im >> _crnt_ic;
   qDebug("SetICFocus IM: %d IC: %d", _crnt_im, _crnt_ic);
-  
+
   // Set font of preedit
   QString ftnamelist = _xim->fontPreedit(_crnt_im, _crnt_ic);
   QString ftname( ftnamelist.section(',', 0, 0) );
-  
+
   // set font size
   QFont   ft;       // Default font
   QString strsize( ftname.section('-', 7, 7) );
@@ -232,9 +232,9 @@ InputMethod::recvXIMSetICFocus()
   }
 
   qDebug("set font: %s", ft.rawName().data());
-  qDebug("set font pixel size:%d  point size:%d", ft.pixelSize(), ft.pointSize());  
+  qDebug("set font pixel size:%d  point size:%d", ft.pixelSize(), ft.pointSize());
   _kanjiconvt->setFont(ft);
-  
+
   if ( _inputon ) {
     setXIMInputtingEnabled( _inputon );  // Re-send XIM_SET_EVENT_MASK
     slotDecideSegments("");     // Sends dummy string for data flush
@@ -249,7 +249,7 @@ InputMethod::recvXIMUnsetICFocus()
   QByteArray buf = _buffer->buffer();   // received data
   QDataStream dsbuf(buf, IO_ReadOnly);
   dsbuf.setByteOrder(sysByteOrder());
-  
+
   char unused[4];
   u_int16_t  im, ic;
   dsbuf.readRawBytes((char*)unused, 4);   // header
@@ -277,7 +277,7 @@ InputMethod::recvXIMSetICValues() const
   QByteArray buf = _buffer->buffer();   // received data
   QDataStream dsbuf(buf, IO_ReadOnly);
   dsbuf.setByteOrder(sysByteOrder());
-  
+
   char unused[4];
   u_int16_t  im, ic, n;
   dsbuf.readRawBytes((char*)unused, 4);   // header
@@ -285,7 +285,7 @@ InputMethod::recvXIMSetICValues() const
   dsbuf.readRawBytes((char*)unused, 2);  // unused
 
   qDebug("XIMSetICValues Request IM:%d IC:%d data size:%d", im, ic, buf.size());
-  
+
   uint pos = dsbuf.device()->at();
   QByteArray xicattr;
   while ( !dsbuf.atEnd() && dsbuf.device()->at() < pos + n) {
@@ -299,10 +299,10 @@ InputMethod::recvXIMSetICValues() const
 
   QByteArray data;         // reply data
   QDataStream ds(data, IO_WriteOnly);
-  ds.setByteOrder(sysByteOrder());  
+  ds.setByteOrder(sysByteOrder());
   ds << (u_int8_t)XIM_SET_IC_VALUES_REPLY << (u_int8_t)0 << numElements( 4 )
      << im << ic;
-  
+
   sendClientMessage(im, data);
   qDebug("XSendEvent XIM_SET_IC_VALUES_REPLY: IM:%d IC:%d", im, ic);
 
@@ -319,14 +319,14 @@ InputMethod::recvXIMSetICValues() const
 }
 
 
-void 
+void
 InputMethod::recvXIMGetICValues() const
 {
   DEBUG_TRACEFUNC();
   QByteArray buf = _buffer->buffer();   // received data
   QDataStream dsbuf(buf, IO_ReadOnly);
   dsbuf.setByteOrder(sysByteOrder());
- 
+
   char unused[4];
   u_int16_t im, ic, n;
   dsbuf.readRawBytes((char*)unused, 4);   // header
@@ -335,7 +335,7 @@ InputMethod::recvXIMGetICValues() const
 
   QByteArray listxicattr;  // reply LISTofXICATTRIBUTE
   QDataStream dsxic(listxicattr, IO_WriteOnly);
-  dsxic.setByteOrder(sysByteOrder()); 
+  dsxic.setByteOrder(sysByteOrder());
 
   for (int i = 0; i < n/2; i++) {
     u_int16_t id;
@@ -346,7 +346,7 @@ InputMethod::recvXIMGetICValues() const
     for (int j = 0; j < pad(value.size()); ++j)
       dsxic << (u_int8_t)0; // unused
   }
-  
+
   QByteArray data;         // reply data
   QDataStream ds(data, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
@@ -355,13 +355,13 @@ InputMethod::recvXIMGetICValues() const
      << im << ic << (u_int16_t)listxicattr.size()
      << (u_int16_t)0;       // unused
   ds.writeRawBytes(listxicattr.data(), listxicattr.size());
-  
+
   sendClientMessage(im, data);
   qDebug("XSendEvent XIM_GET_IC_VALUES_REPLY");
 }
 
 
-void 
+void
 InputMethod::recvXIMCreateIC() const
 {
   DEBUG_TRACEFUNC();
@@ -408,7 +408,7 @@ InputMethod::recvXIMCreateIC() const
 }
 
 
-void 
+void
 InputMethod::recvXIMDestroyIC()
 {
   DEBUG_TRACEFUNC();
@@ -426,10 +426,10 @@ InputMethod::recvXIMDestroyIC()
   QByteArray data;         // reply data
   QDataStream ds(data, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
-  
+
   ds << (u_int8_t)XIM_DESTROY_IC_REPLY << (u_int8_t)0 << numElements(4)
      << im << ic;
-  
+
   sendClientMessage(im, data);
   qDebug("XSendEvent XIM_DESTROY_IC_REPLY");
 }
@@ -461,7 +461,7 @@ InputMethod::recvXIMSync() const
 }
 
 
-void 
+void
 InputMethod::recvXIMSyncReply() const
 {
   DEBUG_TRACEFUNC();
@@ -476,7 +476,7 @@ InputMethod::recvXIMSyncReply() const
 }
 
 
-void 
+void
 InputMethod::recvXIMTriggerNotify()
 {
   DEBUG_TRACEFUNC();
@@ -504,19 +504,19 @@ InputMethod::recvXIMTriggerNotify()
   QByteArray data;         // reply data
   QDataStream ds(data, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
-  
+
   ds << (u_int8_t)XIM_TRIGGER_NOTIFY_REPLY << (u_int8_t)0 << numElements(4)
      << _crnt_im << _crnt_ic;
-  
+
   sendClientMessage(_crnt_im, data);
   qDebug("XSendEvent XIM_TRIGGER_NOTIFY_REPLY");
 
-  emit triggerNotify( !_inputon );  // trigger signal  
+  emit triggerNotify( !_inputon );  // trigger signal
   _kanjiconvt->clear();   // preedit clear, after sendClientMessage
 }
 
 
-void 
+void
 InputMethod::recvXIMEncodingNegotiation() const
 {
   DEBUG_TRACEFUNC();
@@ -525,7 +525,7 @@ InputMethod::recvXIMEncodingNegotiation() const
   QByteArray buf = _buffer->buffer();
   QDataStream dsbuf(buf, IO_ReadOnly);
   dsbuf.setByteOrder(sysByteOrder());
-  
+
   dsbuf.readRawBytes((char*)unused, 4);   // header
   dsbuf >> im >> n;
   qDebug("XIMEncodingNegotiation Request IM: %d", im);
@@ -539,7 +539,7 @@ InputMethod::recvXIMEncodingNegotiation() const
     QCString str(len + 1);
     dsbuf.readRawBytes(str.data(), len);
     qDebug("client supported encoding:%s", str.data());
-   
+
     if ((encode = str) == QCString("COMPOUND_TEXT")) break;
     index++;
   }
@@ -551,7 +551,7 @@ InputMethod::recvXIMEncodingNegotiation() const
 
   ds << (u_int8_t)XIM_ENCODING_NEGOTIATION_REPLY << (u_int8_t)0 << numElements(8)
      << im << (u_int16_t)0 << (int16_t)index << (u_int16_t)0;
-  
+
   sendClientMessage(im, data);
   qDebug("XSendEvent XIM_ENCODING_NEGOTIATION_REPLY");
 }
@@ -570,7 +570,7 @@ InputMethod::recvXIMQureyExtension()
   dsbuf.readRawBytes((char*)unused, 4);   // header
   dsbuf >> im >> n;
   qDebug("XIMQureyExtension Request IM:%d len:%d", im, n);
- 
+
   if ( n ) {
     uint pos = dsbuf.device()->at();
     while ( !dsbuf.atEnd() &&  dsbuf.device()->at() < pos + n) {
@@ -581,7 +581,7 @@ InputMethod::recvXIMQureyExtension()
       qDebug("extensions supported(IM lib):%s", str.data());
     }
   }
-  
+
   QByteArray data;
   QDataStream ds(data, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
@@ -594,13 +594,13 @@ InputMethod::recvXIMQureyExtension()
 }
 
 
-void 
+void
 InputMethod::recvSelectionRequest(const XEvent& e) const
 {
   DEBUG_TRACEFUNC();
-  if (e.xselectionrequest.property != _locales && 
+  if (e.xselectionrequest.property != _locales &&
       e.xselectionrequest.property != _transport) return;
-  
+
   XSelectionEvent se;
   se.type = SelectionNotify;
   se.requestor = e.xselectionrequest.requestor;
@@ -611,12 +611,12 @@ InputMethod::recvSelectionRequest(const XEvent& e) const
   qDebug("selection: %lu", se.selection);
   qDebug("target: %lu", e.xselectionrequest.target);
   qDebug("property: %lu", se.property);
-  
+
   if (se.property == _locales) {
     qDebug("Convert locales");
     char strlocales[] = "@locale=ja_JP.eucJP,ja_JP,japanese,japan,ja";  // ja_JP.SJIS ...
     XChangeProperty(qt_xdisplay(), se.requestor, se.property, se.target, 8,
-		    PropModeAppend, (u_int8_t*)strlocales, 
+		    PropModeAppend, (u_int8_t*)strlocales,
 		    strlen(strlocales));
     XSendEvent(qt_xdisplay(), se.requestor, False, 0, (XEvent*)&se);
 
@@ -624,7 +624,7 @@ InputMethod::recvSelectionRequest(const XEvent& e) const
     qDebug("Convert transport");
     char strtransport[] = "@transport=X/";
     XChangeProperty(qt_xdisplay(), se.requestor, se.property, se.target, 8,
-		    PropModeAppend, (u_int8_t*)strtransport, 
+		    PropModeAppend, (u_int8_t*)strtransport,
 		    strlen(strtransport));
     XSendEvent(qt_xdisplay(), se.requestor, False, 0, (XEvent*)&se);
   }
@@ -650,7 +650,7 @@ InputMethod::recvSelectionClear(const XEvent& e)
 }
 
 
-void 
+void
 InputMethod::recvXIMOpen(const XEvent& e)
 {
   DEBUG_TRACEFUNC();
@@ -661,24 +661,24 @@ InputMethod::recvXIMOpen(const XEvent& e)
   QByteArray listofximattr;   // LISTofXIMATTR
   QDataStream dsxim(listofximattr, IO_WriteOnly);
   dsxim.setByteOrder(sysByteOrder());
-  
+
   QValueList<SupportAttr> imattr = XIMethod::getSuppIMAttr();
   Q_ASSERT(imattr.count() != 0);
- 
+
   for (QValueList<SupportAttr>::const_iterator it = imattr.begin(); it != imattr.end(); ++it) {
     dsxim << (u_int16_t)(*it).id()
 	  << (u_int16_t)(*it).type()
-	  << (u_int16_t)(*it).attribute().length(); 
+	  << (u_int16_t)(*it).attribute().length();
     dsxim.writeRawBytes((*it).attribute().data(), (*it).attribute().length());
     for (int i = 0; i < pad(2 + (*it).attribute().length()); i++) {
       dsxim << (u_int8_t)0;   // unused
     }
-  } 
-  
+  }
+
   QByteArray listofxicattr;   // LISTofXICATTR
   QDataStream dsxic(listofxicattr, IO_WriteOnly);
   dsxic.setByteOrder(sysByteOrder());
-  
+
   QValueList<SupportAttr> icattr = XIMethod::getSuppICAttr();
   Q_ASSERT(icattr.count() != 0);
 
@@ -696,11 +696,11 @@ InputMethod::recvXIMOpen(const XEvent& e)
   QDataStream ds(data, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
   ds << (u_int8_t)XIM_OPEN_REPLY << (u_int8_t)0  // set opcode
-     << (u_int16_t)numElements(8 + listofximattr.size() + 
+     << (u_int16_t)numElements(8 + listofximattr.size() +
 			       listofxicattr.size()); // length
 
   if ( !_cltwinstack.count() ) {
-    qFatal("no client window  %s:%d", __FILE__, __LINE__);    
+    qFatal("no client window  %s:%d", __FILE__, __LINE__);
     return;
   }
 
@@ -709,7 +709,7 @@ InputMethod::recvXIMOpen(const XEvent& e)
   ds.writeRawBytes(listofximattr.data(), listofximattr.size());
   ds << (u_int16_t)listofxicattr.size()
      << (u_int16_t)0;   // unused
-  
+
   ds.writeRawBytes(listofxicattr.data(), listofxicattr.size());
   sendXIMRegisterTriggerkeys(im); // XIM_REGISTER_TRIGGERKEY
   sendClientMessage(im, data);
@@ -729,30 +729,30 @@ InputMethod::recvXIMClose()
   dsbuf.readRawBytes((char*)unused, 4);   // header
   dsbuf >> im;
   qDebug("Close request input-method-ID:%d", im);
-  
+
   QByteArray data;
   QDataStream ds(data, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
   ds << (u_int8_t)XIM_CLOSE_REPLY << (u_int8_t)0 << (u_int16_t)numElements( 4 )
      << (u_int16_t)im << (u_int16_t)0;   // unused
-  
+
   sendClientMessage(im, data);
   qDebug("XSendEvent XIM_CLOSE_REPLY");
   _xim->removeIM(im);
 }
 
 
-void 
+void
 InputMethod::recvXIMConnect(const XEvent& e)
 {
   DEBUG_TRACEFUNC();
- 
+
   // Check byte order and connect to XIM
   Window client = _cltwinstack.top();
   if (e.xclient.data.b[4] == 'B' && sysByteOrder() == QDataStream::BigEndian) {
     qDebug("byte order: BigEndian");
     _xim->connectIM(client);
-    
+
   } else if (e.xclient.data.b[4] == 'l' && sysByteOrder() == QDataStream::LittleEndian) {
     qDebug("byte order: LittleEndian");
     _xim->connectIM(client);
@@ -766,7 +766,7 @@ InputMethod::recvXIMConnect(const XEvent& e)
   qDebug("client-major-protocol-version: %d", e.xclient.data.s[3]);
   qDebug("client-minor-protocol-version: %d", e.xclient.data.s[4]);
   qDebug("number of client-auth-protocol-names: %d", e.xclient.data.s[5]);
- 
+
   Q_ASSERT(e.xclient.data.s[3] == 1);  // check protocol version
   Q_ASSERT(e.xclient.data.s[4] == 0);  // check protocol version
   Q_ASSERT( !e.xclient.data.s[5] );    // unsupported authorization
@@ -801,7 +801,7 @@ InputMethod::recvXIMDisconnect(const XEvent&)
 }
 
 
-void 
+void
 InputMethod::recvProperty(const XEvent& e)
 {
   DEBUG_TRACEFUNC();
@@ -815,13 +815,13 @@ InputMethod::recvProperty(const XEvent& e)
 
   // Get the Atom contained in XIM_SERVERS Property
   int res = XGetWindowProperty(qt_xdisplay(), winId(), e.xclient.data.l[1],
-                               0, e.xclient.data.l[0], True, XA_STRING, 
-			       &type, &format, &nitems, &bytes_after, &value); 
+                               0, e.xclient.data.l[0], True, XA_STRING,
+			       &type, &format, &nitems, &bytes_after, &value);
 
   if (res == Success && (int)nitems == e.xclient.data.l[0] && bytes_after == 0 && value) {
     // Write the receved data to buffer
     Q_ASSERT(_buffer->isOpen());
-    _buffer->writeBlock((char*)value, e.xclient.data.l[0]); 
+    _buffer->writeBlock((char*)value, e.xclient.data.l[0]);
   } else {
     qWarning("Bad response  XGetWindowProperty");
     Q_ASSERT(res == Success);
@@ -834,7 +834,7 @@ InputMethod::recvProperty(const XEvent& e)
 }
 
 
-void 
+void
 InputMethod::recvXIMForwardEvent() const
 {
   DEBUG_TRACEFUNC();
@@ -856,13 +856,13 @@ InputMethod::recvXIMForwardEvent() const
 }
 
 
-void 
+void
 InputMethod::keyPressEvent(QKeyEvent* e)
 {
   DEBUG_TRACEFUNC();
 
   bool ok = TRUE;
-  QPoint pos = calcPreeditPoint(_crnt_im, _crnt_ic, ok); 
+  QPoint pos = calcPreeditPoint(_crnt_im, _crnt_ic, ok);
   if ( ok ) {
     // Set preedit point
     _kanjiconvt->setPreeditPoint(pos);
@@ -881,7 +881,7 @@ InputMethod::keyPressEvent(QKeyEvent* e)
 }
 
 
-void 
+void
 InputMethod::recvXIMResetIC()
 {
   DEBUG_TRACEFUNC();
@@ -893,7 +893,7 @@ InputMethod::recvXIMResetIC()
   dsbuf.readRawBytes((char*)unused, 4);   // header
   dsbuf >> im >> ic;
   qDebug("XIMResetIC request IM:%d IC:%d", im, ic);
-  
+
   QByteArray data;
   QDataStream ds(data, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
@@ -902,10 +902,10 @@ InputMethod::recvXIMResetIC()
   for (int i = 0; i < pad(2); i++) {
     ds << (u_int8_t)0;   // unused
   }
-  
+
   sendClientMessage(im, data);
   qDebug("XSendEvent XIM_RESET_IC_REPLAY");
-  
+
   // preedit clear
   _crnt_im = im;
   _crnt_ic = ic;
@@ -932,19 +932,19 @@ InputMethod::slotDecideSegments(const QString& str)
 
   char* pstr = (char*)alloca(len + 1);
   memcpy(pstr, str.local8Bit().data(), len + 1);
-  
+
   XTextProperty tp;
   memset(&tp, 0, sizeof(tp));
   int res = XmbTextListToTextProperty(qt_xdisplay(), &pstr, 1, XCompoundTextStyle, &tp);
   Q_ASSERT(res == Success);
-  
+
   QByteArray data;         // send data
   QDataStream ds(data, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
   ds << (u_int8_t)XIM_COMMIT << (u_int8_t)0 << numElements(8 + tp.nitems)
      << _crnt_im << _crnt_ic << (u_int16_t)0x0003
      << (u_int16_t)tp.nitems;
-  
+
   if ( tp.value ) {
     ds.writeRawBytes((char*)tp.value, tp.nitems);
     XFree(tp.value);
@@ -953,7 +953,7 @@ InputMethod::slotDecideSegments(const QString& str)
   for (int i = 0; i < pad(tp.nitems); i++) {
     ds << (u_int8_t)0;  // unused
   }
-  
+
   sendClientMessage(_crnt_im, data);
   qDebug("IM:%d IC:%d XSendEvent XIM_COMMIT", _crnt_im, _crnt_ic);
 }
@@ -966,7 +966,7 @@ InputMethod::sendXIMSetEventMask(u_int16_t im, u_int16_t ic, ulong fwrd, ulong s
   QByteArray data;         // send data
   QDataStream ds(data, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
-  
+
   ds << (u_int8_t)XIM_SET_EVENT_MASK << (u_int8_t)0 << numElements(12)
      << im << ic << fwrd << sync;
 
@@ -975,21 +975,23 @@ InputMethod::sendXIMSetEventMask(u_int16_t im, u_int16_t ic, ulong fwrd, ulong s
 }
 
 
-void 
+void
 InputMethod::sendXIMRegisterTriggerkeys(u_int16_t im) const
 {
   DEBUG_TRACEFUNC();
   QByteArray listofkey;
   QDataStream dskey(listofkey, IO_WriteOnly);
-  dskey.setByteOrder(sysByteOrder()); 
+  dskey.setByteOrder(sysByteOrder());
   QString s;
-  
+
   // Set default starting key.
   if ((s = Config::readEntry("_cmbstartkey", "Kanji")) == "Kanji") {
-    dskey << (uint)XK_Kanji << 0L << 0L;
-    
+    //dskey << (uint)XK_Kanji << 0L << 0L;
+    dskey << (uint)XK_Kanji << 0L << 0L << (uint)XK_Zenkaku_Hankaku << 0L << 0L;
+
   } else if (s == "Zenkaku_Hankaku") {
-    dskey << (uint)XK_Zenkaku_Hankaku << 0L << 0L;
+    //dskey << (uint)XK_Zenkaku_Hankaku << 0L << 0L;
+    dskey << (uint)XK_Zenkaku_Hankaku << 0L << 0L << (uint)XK_Kanji << 0L << 0L;
 
   } else {
     QKeySequence ks = QKeySequence( s );
@@ -999,23 +1001,25 @@ InputMethod::sendXIMRegisterTriggerkeys(u_int16_t im) const
     case Qt::SHIFT:
       dskey << c << (uint)ShiftMask << (uint)ShiftMask;
       break;
-      
+
     case Qt::CTRL:
       dskey << c << (uint)ControlMask << (uint)ControlMask;
       if (tolower(c) && tolower(c) != c)
         dskey << (uint)tolower(c) << (uint)ControlMask << (uint)ControlMask;
       break;
-      
+
     case Qt::ALT:
       dskey << c << (uint)Mod1Mask << (uint)Mod1Mask;
-      if (tolower(c) && tolower(c) != c) 
+      if (tolower(c) && tolower(c) != c)
         dskey << (uint)tolower(c) << (uint)Mod1Mask << (uint)Mod1Mask;
       break;
-      
+
     default:
-      dskey << c << 0L << 0L;
-      if (tolower(c) && tolower(c) != c) 
+      //dskey << c << 0L << 0L;
+      dskey << c << 0L << 0L << (uint)XK_Zenkaku_Hankaku << 0L << 0L;
+      if (tolower(c) && tolower(c) != c)
         dskey << (uint)tolower(c) << 0L << 0L;
+        //dskey << (uint)tolower(c) << 0L << (uint)XK_Zenkaku_Hankaku << 0L << 0L;
       break;
     }
   }
@@ -1023,7 +1027,7 @@ InputMethod::sendXIMRegisterTriggerkeys(u_int16_t im) const
   QByteArray data;
   QDataStream ds(data, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
-  
+
   ds << (u_int8_t)XIM_REGISTER_TRIGGERKEYS << (u_int8_t)0 << numElements(12 + 2 * listofkey.size())
      << im << (u_int16_t)0 << (ulong)listofkey.size();
   ds.writeRawBytes(listofkey.data(), listofkey.size()); // on-keys
@@ -1044,7 +1048,7 @@ InputMethod::sendXIMSync(u_int16_t im, u_int16_t ic) const
   ds.setByteOrder(sysByteOrder());
 
   ds << (u_int8_t)XIM_SYNC << (u_int8_t)0 << numElements(4)
-     << im << ic; 
+     << im << ic;
 
   sendClientMessage(im, data);
   qDebug("XSendEvent XIM_SYNC");
@@ -1059,8 +1063,8 @@ InputMethod::sendXIMError(u_int16_t im, u_int16_t ic, XIMErrorFlag flag, XIMErro
   QDataStream ds(data, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
 
-  ds << (u_int8_t)XIM_ERROR << (u_int8_t)0 << numElements(12) 
-     << im << ic << (u_int16_t)flag << (u_int16_t)error 
+  ds << (u_int8_t)XIM_ERROR << (u_int8_t)0 << numElements(12)
+     << im << ic << (u_int16_t)flag << (u_int16_t)error
      << (u_int16_t)0 << (u_int16_t)0;
 
   sendClientMessage(im, data);
@@ -1076,7 +1080,7 @@ InputMethod::sendXIMError(Window client, XIMErrorCode error) const
   QDataStream ds(data, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
 
-  ds << (u_int8_t)XIM_ERROR << (u_int8_t)0 << numElements(12) 
+  ds << (u_int8_t)XIM_ERROR << (u_int8_t)0 << numElements(12)
      << (u_int16_t)0 << (u_int16_t)0 << (u_int16_t)XIM_FLAG_INVALID_IM_IC << (u_int16_t)error
      << (u_int16_t)0 << (u_int16_t)0;
 
@@ -1106,7 +1110,7 @@ InputMethod::sendXIMPreeditStart(u_int16_t im, u_int16_t ic) const
   ds.setByteOrder(sysByteOrder());
 
   ds << (u_int8_t)XIM_PREEDIT_START << (u_int8_t)0 << numElements(4)
-     << im << ic; 
+     << im << ic;
 
   sendClientMessage(im, data);
   qDebug("XSendEvent XIM_PREEDIT_START");
@@ -1122,9 +1126,9 @@ InputMethod::recvXIMPreeditStartReply() const
   QByteArray buf = _buffer->buffer();
   QDataStream dsbuf(buf, IO_ReadOnly);
   dsbuf.setByteOrder(sysByteOrder());
- 
+
   int res;
-  u_int16_t im ,ic;  
+  u_int16_t im ,ic;
   dsbuf.readRawBytes((char*)unused, 4);   // header
   dsbuf >> im >> ic >> res;
   qDebug("XIMPreeditStartReply  im:%d ic:%d  res:%d", im, ic, res);
@@ -1135,7 +1139,7 @@ void
 InputMethod::sendXIMPreeditDraw(u_int16_t im, u_int16_t ic, int caret, int index, int length, const QString& str, const QByteArray& feedback) const
 {
   DEBUG_TRACEFUNC("str: %s", str.local8Bit().data());
-  
+
   if (_xim->getInputStyle(im, ic) != ON_THE_SPOT_STYLE) {
     qWarning("Not on-the-spot style");
     return;
@@ -1163,7 +1167,7 @@ InputMethod::sendXIMPreeditDraw(u_int16_t im, u_int16_t ic, int caret, int index
   QDataStream ds(data, IO_WriteOnly);
   ds.setByteOrder(sysByteOrder());
   ds << im << ic << caret << index << length;
-  
+
   if (!str.isEmpty() && tp.value && tp.nitems > 0) {
     ds << (int)0 << (u_int16_t)tp.nitems;
     ds.writeRawBytes((char*)tp.value, tp.nitems);
@@ -1171,7 +1175,7 @@ InputMethod::sendXIMPreeditDraw(u_int16_t im, u_int16_t ic, int caret, int index
 
     for (int i = 0; i < pad(2 + tp.nitems); ++i)
       ds << (u_int8_t)0;       // unused
-    
+
     ds << (u_int16_t)feedback.size() << (u_int16_t)0;
     ds.writeRawBytes(feedback.data(), feedback.size());
   } else {
@@ -1183,7 +1187,7 @@ InputMethod::sendXIMPreeditDraw(u_int16_t im, u_int16_t ic, int caret, int index
   dsmsg.setByteOrder(sysByteOrder());
   dsmsg << (u_int8_t)XIM_PREEDIT_DRAW << (u_int8_t)0 << numElements(data.size());
   dsmsg.writeRawBytes(data.data(), data.size());
-  
+
   sendClientMessage(im, msg);
   qDebug("XSendEvent XIM_PREEDIT_DRAW");
 }
@@ -1208,7 +1212,7 @@ InputMethod::sendXIMPreeditDone(u_int16_t im, u_int16_t ic) const
   ds.setByteOrder(sysByteOrder());
 
   ds << (u_int8_t)XIM_PREEDIT_DONE << (u_int8_t)0 << numElements(4)
-     << im << ic; 
+     << im << ic;
 
   sendClientMessage(im, data);
   qDebug("XSendEvent XIM_PREEDIT_DONE");
@@ -1216,7 +1220,7 @@ InputMethod::sendXIMPreeditDone(u_int16_t im, u_int16_t ic) const
 }
 
 
-void 
+void
 InputMethod::sendClientMessageProtocol(Window w, XClientMessageEvent& cm) const
 {
   DEBUG_TRACEFUNC();
@@ -1224,7 +1228,7 @@ InputMethod::sendClientMessageProtocol(Window w, XClientMessageEvent& cm) const
   cm.display = qt_xdisplay();
   cm.window = w;
   cm.message_type = _xim_protocol;
-  cm.format = 8;  
+  cm.format = 8;
   XSendEvent(qt_xdisplay(), w, False, 0, (XEvent*)&cm);
   XFlush(qt_xdisplay());
 }
@@ -1232,18 +1236,18 @@ InputMethod::sendClientMessageProtocol(Window w, XClientMessageEvent& cm) const
 
 void
 InputMethod::sendClientMessageMoredata(Window w, XClientMessageEvent& cm) const
-{ 
+{
   DEBUG_TRACEFUNC();
   cm.type = ClientMessage;
   cm.display = qt_xdisplay();
   cm.window = w;
   cm.message_type = _xim_moredata;
-  cm.format = 8; 
+  cm.format = 8;
   XSendEvent(qt_xdisplay(), w, False, 0, (XEvent*)&cm);
 }
 
 
-void 
+void
 InputMethod::sendClientMessage(u_int16_t im, const QByteArray& data) const
 {
   DEBUG_TRACEFUNC();
@@ -1253,7 +1257,7 @@ InputMethod::sendClientMessage(u_int16_t im, const QByteArray& data) const
     return;
   }
 
-  qDebug("Send message. major-protocol-number:%d length:%d", 
+  qDebug("Send message. major-protocol-number:%d length:%d",
 	 (u_int8_t)data[0], len);
   XClientMessageEvent cm;
 
@@ -1280,15 +1284,15 @@ InputMethod::sendClientMessage(u_int16_t im, const QByteArray& data) const
 }
 
 
-void 
+void
 InputMethod::sendPropertywithCM(u_int16_t im, const QByteArray& data) const
 {
   DEBUG_TRACEFUNC();
   Window commwin = _xim->commWin(im);
-  XChangeProperty(qt_xdisplay(), commwin, _kimera_atom, 
+  XChangeProperty(qt_xdisplay(), commwin, _kimera_atom,
 		  XA_STRING, 8, PropModeAppend, (u_int8_t*)data.data(),
 		  data.size());
-  
+
   XClientMessageEvent cm;
   cm.type = ClientMessage;
   cm.display = qt_xdisplay();
@@ -1304,51 +1308,51 @@ InputMethod::sendPropertywithCM(u_int16_t im, const QByteArray& data) const
 
 // X Transport Connection
 // Receive X Transport Connection ClientMessage
-void 
+void
 InputMethod::recvXTransportConnection(const XEvent& e)
 {
   DEBUG_TRACEFUNC();
-  if (e.xclient.message_type != _xim_xconnect || 
+  if (e.xclient.message_type != _xim_xconnect ||
       e.xclient.format != 32) {
     qFatal("incorrect format  %s:%d", __FILE__, __LINE__);
     return;
   }
-  
+
   // Check list count
   if (_cltwinstack.count() > 10) {
     // Exceeds max
     _cltwinstack.pop_front();
-    qDebug("Removes the bottom item from the client-window-stack"); 
+    qDebug("Removes the bottom item from the client-window-stack");
   }
-  
+
   Window cltwin = e.xclient.data.l[0];  // set client window
   _cltwinstack.push(cltwin);
   qDebug("Client communication window ID: %ld", cltwin);
   qDebug("Request client-major-transport-version: %ld", e.xclient.data.l[1]);
   qDebug("Request client-minor-transport-version: %ld", e.xclient.data.l[2]);
-  
+
   XClientMessageEvent cm;
   memset(cm.data.b, 0, 20);
   cm.type = e.xclient.type;
   cm.display = e.xclient.display;
-  cm.window = cltwin;    
+  cm.window = cltwin;
   cm.message_type = e.xclient.message_type;
   cm.format = 32;
   cm.data.l[0] = winId();
   cm.data.l[1] = 0;  // set major transport version
   cm.data.l[2] = 2;  // set minor transport version
   cm.data.l[3] = DIVIDINGSIZE;
-  
+
   qDebug("Reply client-major-transport-version: %ld", cm.data.l[1]);
   qDebug("Reply client-minor-transport-version: %ld", cm.data.l[2]);
-  
+
   XSendEvent(cm.display, cm.window, False, 0, (XEvent*)&cm);
   XFlush(qt_xdisplay());
   qDebug("XSendEvent XTransportConnection reply");
 }
 
 
-void 
+void
 InputMethod::customEvent(QCustomEvent* e)
 {
   DEBUG_TRACEFUNC();
@@ -1361,15 +1365,15 @@ InputMethod::customEvent(QCustomEvent* e)
   }
 
   XEvent* event = (XEvent*)e->data();
-  
+
   // Dispatch Client Message
   if (event->xclient.message_type == _xim_xconnect) {
     recvXTransportConnection(*event);
     return;
-  } else if (event->xclient.message_type == _xim_protocol 
+  } else if (event->xclient.message_type == _xim_protocol
 	     && event->xclient.format == 32) {
     recvProperty(*event);
-  } else if (event->xclient.message_type != _xim_protocol 
+  } else if (event->xclient.message_type != _xim_protocol
 	     && event->xclient.message_type != _xim_moredata) {
     qDebug("Unexpected ClientMessage message_type: %lu", event->xclient.message_type);
     qDebug("Unexpected ClientMessage format: %d", event->xclient.format);
@@ -1379,12 +1383,12 @@ InputMethod::customEvent(QCustomEvent* e)
     Q_ASSERT(_buffer->isOpen());
     _buffer->writeBlock(event->xclient.data.b, 20);
   }
-  
+
   if (event->xclient.message_type == _xim_protocol && _buffer->size() > 0) {
     Q_ASSERT( !_buffer->buffer().at(1) );  // minor-opcode must be zero
     qDebug("=== Received Message Protocol  number:%d  size:%d",
 	   _buffer->buffer().at(0), _buffer->buffer().size());
-  
+
     switch (_buffer->buffer().at(0)) {  // major-opcode of received packet
     case XIM_CONNECT:
       recvXIMConnect( *event );
@@ -1393,11 +1397,11 @@ InputMethod::customEvent(QCustomEvent* e)
     case XIM_DISCONNECT:
       recvXIMDisconnect( *event );
       break;
-      
+
     case XIM_OPEN:
       recvXIMOpen( *event );
       break;
-      
+
     case XIM_CLOSE:
       recvXIMClose();
       break;
@@ -1405,7 +1409,7 @@ InputMethod::customEvent(QCustomEvent* e)
     case XIM_QUERY_EXTENSION:
       recvXIMQureyExtension();
       break;
-      
+
     case XIM_ENCODING_NEGOTIATION:
       recvXIMEncodingNegotiation();
       break;
@@ -1417,7 +1421,7 @@ InputMethod::customEvent(QCustomEvent* e)
     case XIM_CREATE_IC:
       recvXIMCreateIC();
       break;
-      
+
     case XIM_DESTROY_IC:
       recvXIMDestroyIC();
       break;
@@ -1425,11 +1429,11 @@ InputMethod::customEvent(QCustomEvent* e)
     case XIM_GET_IC_VALUES:
       recvXIMGetICValues();
       break;
- 
+
     case XIM_SET_IC_VALUES:
       recvXIMSetICValues();
       break;
-      
+
     case XIM_SET_IC_FOCUS:
       recvXIMSetICFocus();
       break;
@@ -1445,11 +1449,11 @@ InputMethod::customEvent(QCustomEvent* e)
     case XIM_FORWARD_EVENT:
       recvXIMForwardEvent();
       break;
-      
+
     case XIM_ERROR:
       recvXIMError();
       break;
-      
+
     case XIM_RESET_IC:
       recvXIMResetIC();
       break;
@@ -1471,16 +1475,16 @@ InputMethod::customEvent(QCustomEvent* e)
       qDebug("length(byte): %d", *(u_int16_t*)(_buffer->buffer().data() + 2) * 4);
       break;
     }
-    
+
     _buffer->close();
     _buffer->setBuffer(QByteArray(0));   // clean buffer
-    Q_ASSERT(_buffer->size() == 0); 
+    Q_ASSERT(_buffer->size() == 0);
     _buffer->open( IO_WriteOnly | IO_Append );
   }
 }
 
 
-void 
+void
 InputMethod::recvSelectionEvent(const QEvent* e)
 {
   DEBUG_TRACEFUNC();
@@ -1508,7 +1512,7 @@ InputMethod::recvSelectionEvent(const QEvent* e)
     Q_ASSERT(0);
     break;
 
-  default: 
+  default:
     qDebug("unknown selection event:%d", event.type);
     Q_ASSERT(0);
     break;
@@ -1527,7 +1531,7 @@ InputMethod::calcPreeditPoint(u_int16_t im, u_int16_t ic, bool& ok) const
   if (!im || !ic) {
     return QPoint();
   }
-  
+
   // Translate client window coordinates
   Window src_w = _xim->focusWindow(im, ic);
   int x = 0;
@@ -1549,7 +1553,7 @@ InputMethod::calcPreeditPoint(u_int16_t im, u_int16_t ic, bool& ok) const
     y = 0;
     child_win = None;
   }
-  
+
   QPoint pos = QPoint(x, y);
   QPoint spotpret = _xim->spotPreedit(im, ic);
   XIMStyle style = _xim->getInputStyle(im, ic);
@@ -1563,7 +1567,7 @@ InputMethod::calcPreeditPoint(u_int16_t im, u_int16_t ic, bool& ok) const
   } else {
     pos += spotpret;
   }
-  
+
   qDebug("latest focus windows:%ld  IM:%u IC:%u x:%d y:%d",
 	 _xim->focusWindow(im, ic), im, ic, pos.x(), pos.y());
   ok = TRUE;
@@ -1589,7 +1593,7 @@ InputMethod::checkCommWindow(u_int16_t im) const
 	     commwin, attributes.root, qt_xrootwin());
     }
   }
-  
+
   return res;
 }
 
@@ -1665,8 +1669,8 @@ void
 InputMethod::setXIMInputtingEnabled(bool enable)
 {
   DEBUG_TRACEFUNC("enable: %d", enable);
- 
-  _inputon = enable;  
+
+  _inputon = enable;
   if (_crnt_im > 0 && _crnt_ic > 0) {
     if ( _inputon ) {
       // if on-key

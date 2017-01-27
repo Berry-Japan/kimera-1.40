@@ -1,14 +1,21 @@
---- keyassigner.ui.h.orig	2006-04-06 20:39:03.000000000 +0900
-+++ keyassigner.ui.h	2006-10-15 12:19:56.000000000 +0900
-@@ -446,8 +446,9 @@
- 
+--- keyassigner.ui.h.orig	2007-04-08 23:32:15.000000000 +0900
++++ keyassigner.ui.h	2007-11-10 23:23:05.000000000 +0900
+@@ -53,6 +53,8 @@
+     { Qt::CTRL+Qt::Key_U, FID_None, FID_ConvertToHira, FID_ConvertToHira, FID_ConvertToHira, FID_ConvertToHira },
+     { Qt::CTRL+Qt::Key_X, FID_None, FID_CaretToLast, FID_NextCandidate, FID_NextCandidate, FID_LengthenSegment },
+     { Qt::CTRL+Qt::Key_Z, FID_None, FID_DeleteAll, FID_CancelConversion, FID_CancelConversion, FID_CancelConversion },
++    { Qt::Key_Home,      FID_None, FID_CaretToFirst, FID_None, FID_None, FID_None },
++    { Qt::Key_End,       FID_None, FID_CaretToLast, FID_None, FID_None, FID_None },
+     { Qt::Key_Left,      FID_None, FID_CaretBackward, FID_BackwardSegment, FID_BackwardSegment, FID_BackwardSegment },
+     { Qt::Key_Right,     FID_None, FID_CaretForward, FID_ForwardSegment, FID_ForwardSegment, FID_ForwardSegment },
+     { Qt::Key_Up,        FID_None, FID_CaretToFirst, FID_PreviousCandidate, FID_PreviousCandidate, FID_ShortenSegment },
+@@ -451,7 +453,8 @@
+
  void KeyAssigner::saveDefaultSetting()
  {
 -  const int setting = ST_KINPUT2;
--  for (int row = 0; row < MAX_AVAILABLE_KEYS; row++) {
-+    //const int setting = ST_KINPUT2;
-+    const int setting = ST_MSIME;
-+    for (int row = 0; row < MAX_AVAILABLE_KEYS; row++) {
++  //const int setting = ST_KINPUT2;
++  const int setting = ST_MSIME;
+   for (int row = 0; row < MAX_AVAILABLE_KEYS; row++) {
      if ( KeyAssign[setting][row][0] ) {
        for (int col = 0; col <= NUM_OF_CONVSTATUS; col++) {
- 	Config::writeEntry(PREFIX + QString::number(row) + "-" + QString::number(col), KeyAssign[setting][row][col], FALSE);

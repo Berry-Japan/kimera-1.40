@@ -21,7 +21,7 @@
 
 static QStringList CANNA_AF_UNIX_FILES;
 
-CannaEngine::CannaEngine() 
+CannaEngine::CannaEngine()
   : _contxt(0), _convertflag(FALSE), _connectimer(0)
 {
   CANNA_AF_UNIX_FILES << "/tmp/.iroha_unix/IROHA" << "/var/run/.iroha_unix/IROHA";
@@ -58,11 +58,11 @@ CannaEngine::init()
 {
   DEBUG_TRACEFUNC();
   _sock->close();
-  
+
   if ( Config::readBoolEntry("_grpremote", FALSE) ) {
     // INET Domain
     qDebug("INET Domain socket");
-    _sock->connectToHost(Config::readEntry("_edtsvrname", "localhost"), 
+    _sock->connectToHost(Config::readEntry("_edtsvrname", "localhost"),
 			 Config::readEntry("_edtport", "0").toUInt());
     _connectimer = startTimer(3000);
 
@@ -72,7 +72,7 @@ CannaEngine::init()
 
     int  fd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (fd < 0) {
-      QMessageBox::critical(0, "Kanji Server Error", 
+      QMessageBox::critical(0, "Kanji Server Error",
 			    "Socket Create Error",
 			    QMessageBox::Ok | QMessageBox::Default, 0);
       return FALSE;
@@ -84,20 +84,20 @@ CannaEngine::init()
       memset(&addr, 0, sizeof(addr));
       addr.sun_family = AF_UNIX;
       strncpy(addr.sun_path, CANNA_AF_UNIX_FILES[i].latin1(), sizeof(addr.sun_path) - 1);
-      
+
       // connect
       if ( !::connect(fd, (sockaddr *)&addr, sizeof(addr)) )
 	break;
     }
-    
+
     if (i == (int)CANNA_AF_UNIX_FILES.count()) {
-      QMessageBox::critical(0, "Kanji Server Error", 
+      QMessageBox::critical(0, "Kanji Server Error",
 			    "Socket Connection Error",
 			    QMessageBox::Ok | QMessageBox::Default, 0);
       ::close(fd);
       return FALSE;
     }
-    
+
     _sock->setSocket(fd);  // UNIX Domain socket set
     slotConnected();
   }
@@ -106,7 +106,7 @@ CannaEngine::init()
 }
 
 
-void 
+void
 CannaEngine::cleanup()
 {
   DEBUG_TRACEFUNC();
@@ -120,8 +120,8 @@ CannaEngine::cleanup()
 }
 
 
-void 
-CannaEngine::slotConnected() 
+void
+CannaEngine::slotConnected()
 {
   DEBUG_TRACEFUNC();
   qDebug("socket: %d", _sock->socket());
@@ -129,14 +129,14 @@ CannaEngine::slotConnected()
 }
 
 
-void 
-CannaEngine::slotDetectError() 
+void
+CannaEngine::slotDetectError()
 {
   DEBUG_TRACEFUNC();
   cleanup();
   Config::writeEntry("_grpremote", FALSE);
-  
-  QMessageBox::critical(0, "Kanji Server Error", 
+
+  QMessageBox::critical(0, "Kanji Server Error",
 			tr("Canna との通信でエラーが発生しました。\n"
 			   "かな漢字変換を停止します。"),
 			QMessageBox::Ok | QMessageBox::Default, 0);
@@ -157,7 +157,7 @@ CannaEngine::slotConnectionClosed()
 }
 
 
-void 
+void
 CannaEngine::sendInitialize()
 {
   DEBUG_TRACEFUNC();
@@ -171,7 +171,7 @@ CannaEngine::sendInitialize()
   ds << (int)RID_INITIALIZE << (int)user.length() + 1;
   ds.writeRawBytes(user.data(), user.length() + 1);
   _sock->writeBlock(pack.data(), pack.size());
-  
+
   // wait for replay
   QTime t;
   t.start();
@@ -187,15 +187,15 @@ CannaEngine::sendInitialize()
 }
 
 
-void 
+void
 CannaEngine::recvInitializeReply()
 {
   DEBUG_TRACEFUNC();
   uint len;
   if ((len = _sock->size()) != 4) {
     qWarning("Server response incorrect.  %s:%d", __FILE__, __LINE__);
-  } 
-  
+  }
+
   QByteArray respack(len);
   QDataStream ds(respack, IO_ReadOnly);
   ds.setByteOrder(QDataStream::BigEndian);
@@ -205,16 +205,16 @@ CannaEngine::recvInitializeReply()
     qFatal("Recv error.  %s:%d", __FILE__, __LINE__);
     return;
   }
-  
+
   int res;
   ds >> res;
   if (res == -1 || res == -2) {
     cleanup();
-    QMessageBox::critical(0, "Protocol version error", 
+    QMessageBox::critical(0, "Protocol version error",
 			  "Canna protocol version error",
 			  QMessageBox::Ok | QMessageBox::Default, 0);
     return;
-  } 
+  }
 
   QDataStream dst(respack, IO_ReadOnly);
   dst.setByteOrder(QDataStream::BigEndian);
@@ -226,7 +226,7 @@ CannaEngine::recvInitializeReply()
 }
 
 
-void 
+void
 CannaEngine::noticeGroupName()
 {
   DEBUG_TRACEFUNC();
@@ -258,7 +258,7 @@ CannaEngine::noticeGroupName()
 }
 
 
-void 
+void
 CannaEngine::recvNoticeGroupName()
 {
   DEBUG_TRACEFUNC();
@@ -274,18 +274,18 @@ CannaEngine::recvNoticeGroupName()
 
   u_int16_t len;
   ds >> len;
-  
+
   if (len != datalen - 2) {
     qWarning("Server response incorrect.  %s", __func__);
-  } 
-  
+  }
+
   int8_t  stat;
   ds >> stat;
   if (stat) {
     cleanup();
     QMessageBox::critical(0, "mount dictionary error",
 			  "Canna mount dictionary error",
-			  QMessageBox::Ok | QMessageBox::Default, 0);  
+			  QMessageBox::Ok | QMessageBox::Default, 0);
   } else {
     qDebug("notice group name successful.");
   }
@@ -294,14 +294,14 @@ CannaEngine::recvNoticeGroupName()
 }
 
 
-void 
+void
 CannaEngine::getDictionaryList()
 {
   DEBUG_TRACEFUNC();
   QByteArray  pack;
   QDataStream ds(pack, IO_ReadWrite);
   ds.setByteOrder(QDataStream::BigEndian);
-  
+
   ds << (u_int8_t)RID_GET_DICTIONARY_LIST << (u_int8_t)0 << (u_int16_t)4 << _contxt << (u_int16_t)4096;
   _sock->writeBlock(pack.data(), pack.size());
 
@@ -309,12 +309,12 @@ CannaEngine::getDictionaryList()
     slotDetectError();
     return;
   }
-  
+
   recvGetDictionaryListReply();
 }
 
 
-void 
+void
 CannaEngine::recvGetDictionaryListReply()
 {
   DEBUG_TRACEFUNC();
@@ -330,11 +330,11 @@ CannaEngine::recvGetDictionaryListReply()
 
   int16_t len, ndic;
   ds >> len >> ndic;
-  
+
   if (len != (int)datalen - 2) {
     qWarning("Server response incorrect.  %s", __func__);
-  } 
-  
+  }
+
   qDebug("number of dictionary: %d", ndic);
   QString dic;
   QStringList diclist;
@@ -346,14 +346,14 @@ CannaEngine::recvGetDictionaryListReply()
       if ( !s ) break;
       dic += s;
     }
-    
+
     if (!dic.isEmpty())
       diclist << dic;
   }
 
   // Mounts dictionaries
   for (QStringList::Iterator it = diclist.begin(); it != diclist.end(); ++it) {
-    if (*it != "pub") {    // Dosen't mount "pub" dictionary 
+    if (*it != "pub") {    // Dosen't mount "pub" dictionary
       if ( !mountDictionary(*it) )
 	break;
     }
@@ -369,8 +369,8 @@ CannaEngine::mountDictionary(QString dic)
   QByteArray  pack;
   QDataStream ds(pack, IO_ReadWrite);
   ds.setByteOrder(QDataStream::BigEndian);
-    
-  qDebug("request mount dictionary name: %s", dic.data());    
+
+  qDebug("request mount dictionary name: %s", dic.data());
   ds << (u_int8_t)RID_MOUNT_DICTIONARY << (u_int8_t)0 << (u_int16_t)(dic.length()+7) << (int)0x0200 << _contxt;
   ds.writeRawBytes(dic.latin1(), dic.length() + 1);
   _sock->writeBlock(pack.data(), pack.size());
@@ -400,12 +400,12 @@ CannaEngine::recvMountDictionaryReply()
 
   int16_t len;
   ds >> len;
-  
+
   if (len != (int)datalen - 2) {
     qWarning("Server response incorrect.  %s", __func__);
     return FALSE;
-  } 
-  
+  }
+
   int8_t  stat;
   ds >> stat;
   if (stat) {
@@ -414,7 +414,7 @@ CannaEngine::recvMountDictionaryReply()
 			  "Canna mount dictionary error",
 			  QMessageBox::Ok | QMessageBox::Default, 0);
     return FALSE;
-  }  
+  }
   qDebug("mount dictionary successful.");
   return TRUE;
 }
@@ -447,7 +447,7 @@ CannaEngine::beginConvert(const QString& hira, QStringList& kanji, QStringList& 
 
   _convertflag = TRUE;  // start converting
   qDebug("beginConvert in progress ...");
- 
+
   if ( !waitForReply(RID_BEGIN_CONVERT) ) {
     slotDetectError();
     return FALSE;
@@ -484,10 +484,10 @@ CannaEngine::recvBeginConvertReply()
 
   int16_t len;
   ds >> len;
-  
+
   if (len != (int)datalen - 2) {
     qWarning("beginConvert: server response incorrect. (%s)", __func__);
-  } 
+  }
 
   int16_t nbunsetu;
   ds >> nbunsetu;
@@ -521,7 +521,7 @@ CannaEngine::recvBeginConvertReply()
 
 
 void
-CannaEngine::endConvert(const QStringList &)
+CannaEngine::endConvert(const QStringList &kanji)
 {
   DEBUG_TRACEFUNC();
   if ( _sock->state() != QSocket::Connected )
@@ -536,8 +536,18 @@ CannaEngine::endConvert(const QStringList &)
   QDataStream ds(pack, IO_WriteOnly);
   ds.setByteOrder(QDataStream::BigEndian);
 
-  ds << (u_int8_t)RID_END_CONVERT << (u_int8_t)0 << (u_int16_t)8 << _contxt 
-     << (int16_t)0 << 0L;
+  // 学習機能追加のため
+  ds << (u_int8_t)RID_END_CONVERT << (u_int8_t)0 << (u_int16_t)(8+kanji.count()*2)/*データ長*/ << _contxt
+     << (int16_t)kanji.count()/*文節数*/ << 1L/*モード*/;
+  for (int i=0; i < (int)kanji.count(); i++) {
+	QStringList cand;
+	if (getCandidate(i, cand)) {
+	  int n = cand.findIndex(kanji[i]);
+	  ds << (u_int16_t)QMAX(n, 0);
+	}
+  }
+  /*ds << (u_int8_t)RID_END_CONVERT << (u_int8_t)0 << (u_int16_t)8 << _contxt
+     << (int16_t)0 << 0L;*/
   _sock->writeBlock(pack.data(), pack.size());
 
   _convertflag = FALSE;  // conversion done
@@ -547,12 +557,12 @@ CannaEngine::endConvert(const QStringList &)
     slotDetectError();
     return;
   }
-  
+
   recvEndConvertReply();
 }
 
 
-void 
+void
 CannaEngine::recvEndConvertReply() const
 {
   DEBUG_TRACEFUNC();
@@ -562,25 +572,25 @@ CannaEngine::recvEndConvertReply() const
     qFatal("Recv error.  %s:%d", __FILE__, __LINE__);
     return;
   }
-  
+
   QDataStream ds(data, IO_ReadOnly);
   ds.setByteOrder(QDataStream::BigEndian);
-  
+
   int16_t len;
   ds >> len;
-  
+
   if (len != (int)datalen - 2) {
     qWarning("Server response incorrect.  %s", __func__);
     return;
   }
-  
+
   int8_t res;
   ds >> res;
   if ( res ) {
     qFatal("End Convert error.  %s:%d", __FILE__, __LINE__);
     return;
-  } 
-    
+  }
+
   qDebug("endConvert successful");
 }
 
@@ -594,12 +604,12 @@ CannaEngine::getCandidate(int idx, QStringList& candidate)
 
   if ( !_convertflag )
     return FALSE;
- 
+
   QByteArray  pack;
   QDataStream ds(pack, IO_WriteOnly);
   ds.setByteOrder(QDataStream::BigEndian);
 
-  ds << (u_int8_t)RID_GET_CANDIDATE_LIST << (u_int8_t)0 << (u_int16_t)6 << _contxt 
+  ds << (u_int8_t)RID_GET_CANDIDATE_LIST << (u_int8_t)0 << (u_int16_t)6 << _contxt
      << (int16_t)idx << (u_int16_t)4096;
   _sock->writeBlock(pack.data(), pack.size());
 
@@ -623,13 +633,13 @@ CannaEngine::recvGetCandidateListReply()
     qFatal("Recv error.  %s:%d", __FILE__, __LINE__);
     return QStringList();
   }
-  
+
   QDataStream ds(data, IO_ReadOnly);
   ds.setByteOrder(QDataStream::BigEndian);
-  
+
   int16_t len;
   ds >> len;
-  
+
   if (len != (int)datalen - 2) {
     qWarning("Server response incorrect.  %s", __func__);
     return QStringList();
@@ -642,30 +652,30 @@ CannaEngine::recvGetCandidateListReply()
     return QStringList();
   }
   qDebug("Number of Candidates: %d", ncand);
-  
+
   if ( !ncand ) {
     return QStringList();
   }
-  
+
   QStringList  listcand;
   for (int i = 0; i < ncand; i++) {
     QByteArray  ba;
     QDataStream dsba(ba, IO_WriteOnly);
     dsba.setByteOrder(QDataStream::BigEndian);
     u_int16_t us;
-    
+
     ds >> us;
     while (us) {
       dsba << us;
       ds >> us;
-    }    
-    
+    }
+
     QString str = tr(uint16ToEuc(ba));
     if ( !str.isEmpty() && listcand.find(str) == listcand.end()) {
       listcand << str;
     }
   }
-  
+
   qDebug("[%s]  %s", __func__, listcand.join(" ").local8Bit().data());
   return listcand;
 }
@@ -681,11 +691,11 @@ CannaEngine::getYomi(int idx)
   QByteArray  pack;
   QDataStream ds(pack, IO_WriteOnly);
   ds.setByteOrder(QDataStream::BigEndian);
-  
-  ds << (u_int8_t)RID_GET_YOMI << (u_int8_t)0 << (u_int16_t)6 << _contxt 
+
+  ds << (u_int8_t)RID_GET_YOMI << (u_int8_t)0 << (u_int16_t)6 << _contxt
      << (int16_t)idx << (u_int16_t)4096;
   _sock->writeBlock(pack.data(), pack.size());
-  
+
   if ( !waitForReply(RID_GET_YOMI) ) {
     slotDetectError();
     return QString::null;
@@ -705,32 +715,32 @@ CannaEngine::recvGetYomiReply()
     qFatal("Recv error.  %s:%d", __FILE__, __LINE__);
     return QString::null;
   }
-  
+
   QDataStream ds(data, IO_ReadOnly);
   ds.setByteOrder(QDataStream::BigEndian);
-  
+
   int16_t len;
   ds >> len;
-  
+
   if (len != (int)datalen - 2) {
     qWarning("Server response incorrect.  %s", __func__);
     return QString::null;
   }
-  
+
   int16_t n;
   ds >> n;
-  
+
   QByteArray  ba;
   QDataStream dsba(ba, IO_WriteOnly);
   dsba.setByteOrder(QDataStream::BigEndian);
   u_int16_t us;
-  
+
   ds >> us;
   while (us) {
     dsba << us;
     ds >> us;
-  }    
-  
+  }
+
   return tr(uint16ToEuc(ba));
 }
 
@@ -755,9 +765,9 @@ CannaEngine::resizeSegment(int idx, int len, QStringList& kanji, QStringList& yo
   QByteArray  pack;
   QDataStream ds(pack, IO_WriteOnly);
   ds.setByteOrder(QDataStream::BigEndian);
-  
-  ds << (u_int8_t)RID_RESIZE_PAUSE << (u_int8_t)0 
-     << (u_int16_t)6 << _contxt 
+
+  ds << (u_int8_t)RID_RESIZE_PAUSE << (u_int8_t)0
+     << (u_int16_t)6 << _contxt
      << (int16_t)idx << (u_int16_t)len;
   _sock->writeBlock(pack.data(), pack.size());
 
@@ -790,25 +800,25 @@ CannaEngine::recvResizePause()
     qFatal("Recv error.  %s:%d", __FILE__, __LINE__);
     return QStringList();
   }
-  
+
   QDataStream ds(data, IO_ReadOnly);
   ds.setByteOrder(QDataStream::BigEndian);
-  
+
   int16_t len;
   ds >> len;
-  
+
   if (len != (int)datalen - 2) {
     qWarning("Server response incorrect.  %s", __func__);
     return QStringList();
   }
-  
+
   int16_t nbunsetu;
   ds >> nbunsetu;
   if (nbunsetu <= 0) {
     qDebug("Convert error.  %s", __func__);
     return QStringList();
   }
-  
+
   qDebug("%s Number of Bunsetu: %d", __func__, nbunsetu);
 
   QStringList strlist;
@@ -823,7 +833,7 @@ CannaEngine::recvResizePause()
       dsba << us;
       ds >> us;
     }
-    
+
     QString str = tr(uint16ToEuc(ba));
     if ( !str.isEmpty() )
       strlist << str;
@@ -857,14 +867,14 @@ CannaEngine::waitForReply(int msgid, int msecs)
     qWarning("Bad message ID : req:0x%x  recv:0x%x", (u_int8_t)msgid, (u_int8_t)buf[0]);
     return FALSE;
   }
-  
+
   return TRUE;
 }
 
 
 // 返却値はネットワークバイトオーダ変換済なので，直ちに送信可能
 // 末尾に (u_int16_t)0 が追加
-QByteArray 
+QByteArray
 CannaEngine::eucToUint16(const QCString& src)
 {
   QByteArray dest;
@@ -880,14 +890,14 @@ CannaEngine::eucToUint16(const QCString& src)
 
     } else if (it + 1 != src.end()) {
       switch ((u_int8_t)*it) {
-      case 0x8e:   // 半角カナ	
+      case 0x8e:   // 半角カナ
 	dsdest << (u_int16_t)(0x0080 | (*(++it) & 0x7f));
 	break;
 
       case 0x8f:   // 外字
 	if (it + 2 == src.end())
 	  return 0;
-	
+
 	dsdest << (u_int16_t)(0x8000 | ((*(++it) & 0x7f) << 8) | (*(++it) & 0x7f));
 	break;
 
@@ -903,13 +913,13 @@ CannaEngine::eucToUint16(const QCString& src)
 
     ++it;
   }
-  
+
   return dest;
 }
 
 
 // 引数はネットワークバイトオーダの配列を指定
-QCString 
+QCString
 CannaEngine::uint16ToEuc(const QByteArray& src)
 {
   QDataStream dssrc(src, IO_ReadOnly);
@@ -923,7 +933,7 @@ CannaEngine::uint16ToEuc(const QByteArray& src)
   while (!dssrc.atEnd()) {
     u_int16_t us;
     dssrc >> us;
- 
+
     switch (us & 0x8080) {
     case 0:  // ASCII
       dsdst << (u_int8_t)(us & 0x007f);
@@ -942,7 +952,7 @@ CannaEngine::uint16ToEuc(const QByteArray& src)
       b = (us & 0xff00) >> 8;
       if (b >= 0xa1 && b <= 0xa8 || b >= 0xb0 && b <= 0xf4) {  // EUC code
 	dsdst << us;
-	
+
       } else if (us >= 0xada1 && us <= 0xadb4) {
 	str.sprintf("(%u)", us - 0xada0);
 	dst += str;
@@ -957,7 +967,7 @@ CannaEngine::uint16ToEuc(const QByteArray& src)
       break;
     }
   }
-  
+
   dsdst << (u_int8_t)0;
   return dst;
 }
@@ -970,12 +980,12 @@ CannaEngine::timerEvent(QTimerEvent* e)
   if (_connectimer > 0 && e->timerId() == _connectimer) {
     killTimer(_connectimer);
     _connectimer = 0;
-    
+
     if (_sock->state() != QSocket::Connected) {
       // Detects error
       cleanup();
       Config::writeEntry("_grpremote", FALSE);
-      
+
       QMessageBox::warning(0, "Kanji Server Connection Error",
 			   tr("Canna とのセッションを確立できません。\n"
 			      "かな漢字変換を停止します。"),

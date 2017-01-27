@@ -21,7 +21,7 @@ static QValueVector<QString>  FuncName(FID_NumFunctions);
 static int KeyAssign[NUM_SETTING_TYPE][MAX_AVAILABLE_KEYS][NUM_OF_CONVSTATUS + 1] = {
   { { Qt::Key_Space,     FID_InsertSpace, FID_ConvertAllSegments, FID_NextCandidate, FID_NextCandidate, FID_ConvertCrntSegment },    // MSIME
     { Qt::CTRL+Qt::Key_Space,  FID_None, FID_ConvertToOneSegment, FID_None, FID_None, FID_None },
-    { Qt::SHIFT+Qt::Key_Space, FID_InsertOtherWidthSpace, FID_ConvertAllSegments, FID_PreviousCandidate, FID_PreviousCandidate, FID_ConvertCrntSegment },
+    { Qt::SHIFT+Qt::Key_Space, FID_InsertOtherWidthSpace, FID_ConvertAllSegments, FID_PreviousCandidate, FID_PreviousCandidate, FID_ConvertCrntSegment }, 
     { Qt::CTRL+Qt::SHIFT+Qt::Key_Space,  FID_InsertMultibyteSpace, FID_None, FID_None, FID_None, FID_None },
     { Qt::Key_Return,    FID_None, FID_DecideAllSegments, FID_DecideAllSegments, FID_DecideAllSegments, FID_DecideAllSegments },
     { Qt::Key_Enter,     FID_None, FID_DecideAllSegments, FID_DecideAllSegments, FID_DecideAllSegments, FID_DecideAllSegments },
@@ -53,6 +53,8 @@ static int KeyAssign[NUM_SETTING_TYPE][MAX_AVAILABLE_KEYS][NUM_OF_CONVSTATUS + 1
     { Qt::CTRL+Qt::Key_U, FID_None, FID_ConvertToHira, FID_ConvertToHira, FID_ConvertToHira, FID_ConvertToHira },
     { Qt::CTRL+Qt::Key_X, FID_None, FID_CaretToLast, FID_NextCandidate, FID_NextCandidate, FID_LengthenSegment },
     { Qt::CTRL+Qt::Key_Z, FID_None, FID_DeleteAll, FID_CancelConversion, FID_CancelConversion, FID_CancelConversion },
+    { Qt::Key_Home,      FID_None, FID_CaretToFirst, FID_None, FID_None, FID_None },
+    { Qt::Key_End,       FID_None, FID_CaretToLast, FID_None, FID_None, FID_None },
     { Qt::Key_Left,      FID_None, FID_CaretBackward, FID_BackwardSegment, FID_BackwardSegment, FID_BackwardSegment },
     { Qt::Key_Right,     FID_None, FID_CaretForward, FID_ForwardSegment, FID_ForwardSegment, FID_ForwardSegment },
     { Qt::Key_Up,        FID_None, FID_CaretToFirst, FID_PreviousCandidate, FID_PreviousCandidate, FID_ShortenSegment },
@@ -66,7 +68,7 @@ static int KeyAssign[NUM_SETTING_TYPE][MAX_AVAILABLE_KEYS][NUM_OF_CONVSTATUS + 1
     { Qt::SHIFT+Qt::Key_Up,    FID_None, FID_None, FID_None, FID_PreviousCandidateGroup, FID_None },
     { Qt::SHIFT+Qt::Key_Down,  FID_None, FID_None, FID_None, FID_NextCandidateGroup, FID_None },
     { Qt::Key_PageUp,    FID_None, FID_None, FID_None, FID_PreviousCandidateGroup, FID_None },
-    { Qt::Key_PageDown,  FID_None, FID_None, FID_None, FID_NextCandidateGroup, FID_None },
+    { Qt::Key_PageDown,  FID_None, FID_None, FID_None, FID_NextCandidateGroup, FID_None },    
     { Qt::Key_F6,        FID_None, FID_ConvertToHira, FID_ConvertToHira, FID_ConvertToHira, FID_ConvertToHira },
     { Qt::Key_F7,        FID_None, FID_ConvertToKana, FID_ConvertToKana, FID_ConvertToKana, FID_ConvertToKana },
     { Qt::Key_F8,        FID_None, FID_ConvertToHankakuKana, FID_ConvertToHankakuKana, FID_ConvertToHankakuKana, FID_ConvertToHankakuKana },
@@ -103,7 +105,7 @@ static int KeyAssign[NUM_SETTING_TYPE][MAX_AVAILABLE_KEYS][NUM_OF_CONVSTATUS + 1
     { Qt::CTRL+Qt::Key_N, FID_None, FID_DecideAllSegments, FID_DecideCrntSegment, FID_DecideCrntSegment, FID_DecideCrntSegment },
     { Qt::CTRL+Qt::Key_O, FID_None, FID_ConvertToHankakuKana, FID_ConvertToHankakuKana, FID_ConvertToHankakuKana, FID_ConvertToHankakuKana },
     { Qt::CTRL+Qt::Key_P, FID_None, FID_ConvertToZenkakuEisu, FID_ConvertToZenkakuEisu, FID_ConvertToZenkakuEisu, FID_ConvertToZenkakuEisu },
-    { Qt::CTRL+Qt::Key_S, FID_None, FID_CaretBackward, FID_BackwardSegment, FID_BackwardSegment, FID_ShortenSegment },
+    { Qt::CTRL+Qt::Key_S, FID_None, FID_CaretBackward, FID_BackwardSegment, FID_BackwardSegment, FID_ShortenSegment },   
     { Qt::CTRL+Qt::Key_U, FID_None, FID_ConvertToHira, FID_ConvertToHira, FID_ConvertToHira, FID_ConvertToHira },
     { Qt::CTRL+Qt::Key_At, FID_None, FID_ConvertToHankakuEisu, FID_ConvertToHankakuEisu, FID_ConvertToHankakuEisu, FID_ConvertToHankakuEisu },
     { Qt::Key_Home,      FID_None, FID_CaretToFirst, FID_None, FID_None, FID_None },
@@ -115,21 +117,21 @@ static int KeyAssign[NUM_SETTING_TYPE][MAX_AVAILABLE_KEYS][NUM_OF_CONVSTATUS + 1
     { Qt::CTRL+Qt::Key_Left,   FID_None, FID_CaretToFirst, FID_ToFirstSegment, FID_ToFirstSegment, FID_ShortenSegment },
     { Qt::CTRL+Qt::Key_Right,  FID_None, FID_CaretToLast, FID_ToLastSegment, FID_ToLastSegment, FID_LengthenSegment },
     { Qt::CTRL+Qt::Key_Up,     FID_None, FID_None, FID_PreviousCandidate, FID_PreviousCandidate, FID_None },
-    { Qt::SHIFT+Qt::Key_Left,  FID_None, FID_CaretBackward, FID_BackwardSegment, FID_BackwardSegment, FID_ShortenSegment },
+    { Qt::SHIFT+Qt::Key_Left,  FID_None, FID_CaretBackward, FID_BackwardSegment, FID_BackwardSegment, FID_ShortenSegment },    
     { Qt::SHIFT+Qt::Key_Right, FID_None, FID_CaretForward, FID_ForwardSegment, FID_ForwardSegment, FID_LengthenSegment },
     { Qt::SHIFT+Qt::Key_Up,    FID_None, FID_None, FID_PreviousCandidate, FID_PreviousCandidate, FID_None },
     { Qt::SHIFT+Qt::Key_Down,  FID_None, FID_None, FID_DecideCrntSegment, FID_DecideCrntSegment, FID_DecideCrntSegment },
     { Qt::Key_PageUp,    FID_None, FID_None, FID_PreviousCandidateGroup, FID_PreviousCandidateGroup, FID_None },
-    { Qt::Key_PageDown,  FID_None, FID_None, FID_NextCandidateGroup, FID_NextCandidateGroup, FID_None },
+    { Qt::Key_PageDown,  FID_None, FID_None, FID_NextCandidateGroup, FID_NextCandidateGroup, FID_None }, 
     { Qt::Key_F6,        FID_None, FID_ConvertToHira, FID_ConvertToHira, FID_ConvertToHira, FID_ConvertToHira },
     { Qt::Key_F7,        FID_None, FID_ConvertToKana, FID_ConvertToKana, FID_ConvertToKana, FID_ConvertToKana },
     { Qt::Key_F8,        FID_None, FID_ConvertToHankakuKana, FID_ConvertToHankakuKana, FID_ConvertToHankakuKana, FID_ConvertToHankakuKana },
     { Qt::Key_F9,        FID_None, FID_ConvertToZenkakuEisu, FID_ConvertToZenkakuEisu, FID_ConvertToZenkakuEisu, FID_ConvertToZenkakuEisu },
     { Qt::Key_F10,       FID_None, FID_ConvertToHankakuEisu, FID_ConvertToHankakuEisu, FID_ConvertToHankakuEisu, FID_ConvertToHankakuEisu },
-    { Qt::Key_Henkan,    FID_ReconvertClipboardString, FID_ConvertAllSegments, FID_NextCandidate, FID_NextCandidate, FID_ConvertCrntSegment },
+    { Qt::Key_Henkan,    FID_ReconvertClipboardString, FID_ConvertAllSegments, FID_NextCandidate, FID_NextCandidate, FID_ConvertCrntSegment },  
     { Qt::CTRL+Qt::Key_F7,  FID_ExecDictTool, FID_None, FID_None, FID_None, FID_None },
     { Qt::CTRL+Qt::Key_F12, FID_ShowPropertyDialog, FID_None, FID_None, FID_None, FID_None }, },
-
+  
   { { Qt::Key_Space,      FID_InsertSpace, FID_ConvertAllSegments, FID_NextCandidate, FID_NextCandidate, FID_ConvertCrntSegment },  // KINPUT2
     { Qt::CTRL+Qt::Key_Space, FID_None, FID_ConvertToOneSegment, FID_NextCandidate, FID_NextCandidate, FID_ConvertCrntSegment },
     { Qt::SHIFT+Qt::Key_Space, FID_InsertOtherWidthSpace, FID_ConvertAllSegments, FID_PreviousCandidate, FID_PreviousCandidate, FID_ConvertCrntSegment },
@@ -178,7 +180,7 @@ static int KeyAssign[NUM_SETTING_TYPE][MAX_AVAILABLE_KEYS][NUM_OF_CONVSTATUS + 1
     { Qt::Key_F11,       FID_ExecDictTool, FID_None, FID_None, FID_None, FID_None },
     { Qt::Key_F12,       FID_ShowPropertyDialog, FID_None, FID_None, FID_None, FID_None },
     { Qt::Key_Henkan,    FID_ReconvertClipboardString, FID_ConvertAllSegments, FID_NextCandidate, FID_NextCandidate, FID_ConvertCrntSegment },  },
-
+  
   { { Qt::Key_Space,     FID_InsertSpace, FID_ConvertAllSegments, FID_NextCandidate, FID_NextCandidate, FID_ConvertCrntSegment },    // VJE
     { Qt::CTRL+Qt::Key_Space, FID_None, FID_ConvertToOneSegment, FID_ForwardSegment, FID_ForwardSegment, FID_ForwardSegment },
     { Qt::SHIFT+Qt::Key_Space, FID_InsertOtherWidthSpace, FID_ConvertAllSegments, FID_LengthenSegment, FID_PreviousCandidate, FID_LengthenSegment },
@@ -221,11 +223,11 @@ static int KeyAssign[NUM_SETTING_TYPE][MAX_AVAILABLE_KEYS][NUM_OF_CONVSTATUS + 1
     { Qt::CTRL+Qt::Key_Up,     FID_None, FID_ConvertAllSegments, FID_ShortenSegment, FID_ShortenSegment, FID_ShortenSegment },
     { Qt::CTRL+Qt::Key_Down,   FID_None, FID_ConvertAllSegments, FID_DecideCrntSegment, FID_DecideCrntSegment, FID_LengthenSegment },
     { Qt::SHIFT+Qt::Key_Left,  FID_None, FID_CaretBackward, FID_ShortenSegment, FID_ShortenSegment, FID_ShortenSegment },
-    { Qt::SHIFT+Qt::Key_Right, FID_None, FID_CaretForward, FID_LengthenSegment, FID_LengthenSegment, FID_LengthenSegment },
+    { Qt::SHIFT+Qt::Key_Right, FID_None, FID_CaretForward, FID_LengthenSegment, FID_LengthenSegment, FID_LengthenSegment },    
     { Qt::SHIFT+Qt::Key_Up,    FID_None, FID_ConvertAllSegments, FID_PreviousCandidate, FID_PreviousCandidateGroup, FID_ConvertCrntSegment },
     { Qt::SHIFT+Qt::Key_Down,  FID_None, FID_ConvertAllSegments, FID_NextCandidate, FID_NextCandidateGroup, FID_ConvertCrntSegment },
     { Qt::Key_PageUp,    FID_None, FID_CaretToFirst, FID_PreviousCandidate, FID_PreviousCandidateGroup, FID_None },
-    { Qt::Key_PageDown,  FID_None, FID_CaretToLast, FID_NextCandidate, FID_NextCandidateGroup, FID_None },
+    { Qt::Key_PageDown,  FID_None, FID_CaretToLast, FID_NextCandidate, FID_NextCandidateGroup, FID_None }, 
     { Qt::Key_F6,        FID_None, FID_ConvertToHira, FID_ConvertToHira, FID_ConvertToHira, FID_ConvertToHira },
     { Qt::Key_F7,        FID_None, FID_ConvertToKana, FID_ConvertToKana, FID_ConvertToKana, FID_ConvertToKana },
     { Qt::Key_F8,        FID_None, FID_ConvertToZenkakuEisu, FID_ConvertToZenkakuEisu, FID_ConvertToZenkakuEisu, FID_ConvertToZenkakuEisu },
@@ -265,7 +267,7 @@ void KeyAssigner::init()
   FuncName[FID_DecidePredictedCandidate] = tr("ÕΩ¬¨∏ı ‰≥ŒƒÍ");
   FuncName[FID_CancelConversion]         = tr("¡¥Ã·§∑");
   FuncName[FID_LengthenSegment]          = tr(" ∏¿·ƒπ°‹£±");
-  FuncName[FID_ShortenSegment]           = tr(" ∏¿·ƒπ°æ£±");
+  FuncName[FID_ShortenSegment]           = tr(" ∏¿·ƒπ°›£±");
   FuncName[FID_InsertSpace]              = tr("∂ı«Ú ∏ª˙");
   FuncName[FID_InsertAsciiSpace]         = tr("»æ≥—∂ı«Ú");
   FuncName[FID_InsertMultibyteSpace]     = tr("¡¥≥—∂ı«Ú");
@@ -321,14 +323,14 @@ void KeyAssigner::saveSetting()
       Config::writeEntry(PREFIX + QString::number(row) + "-" + QString::number(0), key);
 
       for (int col = 1; col <= NUM_OF_CONVSTATUS; col++) {
-	Config::writeEntry(PREFIX + QString::number(row)
+	Config::writeEntry(PREFIX + QString::number(row) 
 			   + "-" + QString::number(col), (int)functionID(_keyassigntbl->text(row, col)));
       }
-
+    
     } else {
       // 0 clear
       for (int col = 0; col <= NUM_OF_CONVSTATUS; col++)
-	Config::writeEntry(PREFIX + QString::number(row)
+	Config::writeEntry(PREFIX + QString::number(row) 
 			   + "-" + QString::number(col), (int)0);
     }
   }
@@ -354,7 +356,7 @@ void KeyAssigner::loadSetting( int index )
       QKeySequence keyseq(key);
       _keyassigntbl->insertRows(row);
       _keyassigntbl->setText(row, 0, (QString)keyseq);
-
+      
       for (int col = 1; col <= NUM_OF_CONVSTATUS; col++) {
 	int funcid = Config::readNumEntry(PREFIX + QString::number(row) + "-" + QString::number(col), FID_None);
 	_keyassigntbl->setText(row, col, functionName( (FuncID)funcid ));
@@ -363,7 +365,7 @@ void KeyAssigner::loadSetting( int index )
     _keyassigntbl->setNumRows(row);
     _cmbloadsetting->setCurrentItem( Config::readNumEntry(_cmbloadsetting->name(), 0) );
     break;
-
+    
   case ST_MSIME:
   case ST_ATOK:
   case ST_KINPUT2:
@@ -375,14 +377,14 @@ void KeyAssigner::loadSetting( int index )
       QKeySequence keyseq( KeyAssign[index][row][0] );
       _keyassigntbl->insertRows(row);
       _keyassigntbl->setText(row, 0, keyseq);
-
+      
       for (int col = 1; col <= NUM_OF_CONVSTATUS; col++) {
 	_keyassigntbl->setText(row, col, functionName( (FuncID)KeyAssign[index][row][col] ));
       }
     }
     _keyassigntbl->setNumRows(row);
     break;
-
+    
   default:
     break;
   }
@@ -401,7 +403,7 @@ FuncID KeyAssigner::functionID( const QString & func )
 {
   int id;
   for (id = 0; id < FID_NumFunctions; ++id) {
-    if (FuncName[id] == func)
+    if (FuncName[id] == func) 
       break;
   }
   return (id < FID_NumFunctions) ? (FuncID)id : FID_None;
@@ -426,11 +428,11 @@ FuncID KeyAssigner::functionID( int key, ConvStatus stat )
       return (FuncID)KeyAssign[crntset][i][(int)stat];
     }
   }
-
+  
   if (key & ~(0xff | SHIFT)) {
     return FID_None;
   }
-
+  
   return FID_InsertChar;
 }
 

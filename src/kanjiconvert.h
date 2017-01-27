@@ -36,7 +36,7 @@ public:
   void    setFont(QFont);
   void    setPreeditPoint(QPoint);
   InputMode inputMode() const { return _mode; }
-  
+
 public slots:
   void    init();
   void    clear();
@@ -125,7 +125,8 @@ private:
   uint                  _minsegidx;      // minimum segment index
   QPtrList<QKeyEvent>   _inputkev;       // input key events
   QStringList           _yomiseglist;    // yomigana segment list
-  QStringList           _convtkanjilist; // kanji string list converted
+  QStringList           _convtkanjilist; // converted kanji string list
+  //QList                 _selectedcand;   // selected cand list
   ConvStatus            _stat;           // kanji conversion status
   InputMode             _mode;           // input mode
   DictHiragana          _dict;
@@ -134,7 +135,7 @@ private:
   PreeditArea*          _preedit;
   CandidateListBox*     _candlist;
   uint                  _caretpos;
-  
+
   static QIntDict<FuncPtr>   funcptrdict;  // dictionary of function pointer
 };
 
@@ -144,7 +145,7 @@ public:
   explicit FuncPtr(pmfunc p) : _pmf(p) { }
   pmfunc   ptr() const { return _pmf; }
 
-private:  
+private:
   pmfunc   _pmf;  // pointer to member function of KanjiConvert class
 };
 

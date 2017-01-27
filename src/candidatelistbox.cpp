@@ -9,7 +9,7 @@
 const int MARGIN = 6;
 const int CURRENT_ITEM_LABEL_HEIGHT = 20;
 
-CandidateListBox::CandidateListBox() 
+CandidateListBox::CandidateListBox()
   :  QFrame(0, "candidatelistbox", WStyle_StaysOnTop | WStyle_Customize | WStyle_NoBorder | WStyle_Tool | WX11BypassWM),
      _pos()
 {
@@ -167,7 +167,7 @@ CandidateListBox::showEvent(QShowEvent* e)
   int y = _pos.y();
   if (y > QApplication::desktop()->height() - height() - offset) {
     if (KimeraApp::inputmethod()->currentXIMStyle() != ON_THE_SPOT_STYLE) {
-      QFontMetrics fm( font() ); 
+      QFontMetrics fm( font() );
       y -= height() + fm.height() + 1;
     } else {
       y = QMIN(y, QApplication::desktop()->height() - height() - offset);
@@ -192,7 +192,7 @@ CandidateListBox::setFont(const QFont& f)
   QFont font(f);
   if (QFontInfo(font).pixelSize() > 20)
     font.setPixelSize(20);
-  
+
   _lbl->setFont(font);
   QFontMetrics fm(font);
   int w = fm.width("0") * 2;
@@ -200,7 +200,7 @@ CandidateListBox::setFont(const QFont& f)
 
   _lstbox->move(w + 1, 1);
   _lstbox->setFont(font);
-  
+
   QFrame::setFont(font);
 
   font.setPixelSize(12);
@@ -256,6 +256,12 @@ CandidateListBox::candidatePredicted() const
   return _predictxt->isVisible() ? _predictxt->text() : QString::null;
 }
 
+
+int
+CandidateListBox::currentItem() const
+{
+  return _lstbox->currentItem();
+}
 
 QString
 CandidateListBox::currentText() const

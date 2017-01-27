@@ -1,5 +1,5 @@
-%define version   1.40
-%define release   b1
+%define version   1.40+
+%define release   b2
 
 Name:		kimera
 Summary:	Another input method for Japanese
@@ -24,6 +24,7 @@ It supports Whiz.
 
 %build
 qmake "target.path=/usr/lib/kimera" "script.path=/usr/bin" "no_anthy=1" kimera.pro
+sed -e "s/-O2 -g/-Os/g; s/-march=i386/-march=i586/g" -i Makefile
 make clean
 make %{?_smp_mflags}
 
@@ -54,6 +55,8 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Nov 8 2007 Yuichiro Nakada <berry@po.yui.mine.nu>
+- Added the endConvert code for WHIZ's word learning
 * Wed Apr 11 2007 Yuichiro Nakada <berry@po.yui.mine.nu>
 - Update to 1.40
 * Sat Oct 14 2006 Yuichiro Nakada <berry@po.yui.mine.nu>

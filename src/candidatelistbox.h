@@ -23,6 +23,7 @@ public:
   void selectPreviousCandidate(uint decrement = 1);
   void selectNextCandidate(uint increment = 1);
   void setFont(const QFont&);
+  int currentItem() const;
   QString currentText() const;
   QString text(int index) const;
   int  topItem() const;
