@@ -1,0 +1,29 @@
+--- propertydialog.ui.h.orig	2006-04-06 20:39:03.000000000 +0900
++++ propertydialog.ui.h	2006-10-14 20:14:17.000000000 +0900
+@@ -396,11 +396,13 @@
+
+ void PropertyDialog::saveDefaultSetting()
+ {
+-  Config::writeEntry("_cmbstartkey", tr("Zenkaku_Hankaku"), FALSE);
++  //Config::writeEntry("_cmbstartkey", tr("Zenkaku_Hankaku"), FALSE);
++  Config::writeEntry("_cmbstartkey", tr("Kanji"), FALSE);
+   Config::writeEntry("_cmbinputmode", tr("ひらがな"), FALSE);
+   Config::writeEntry("_cmbinputstyle", tr("ローマ字入力"), FALSE);
+-  Config::writeEntry("_chkdispbar", FALSE, FALSE);
+-
++  //Config::writeEntry("_chkdispbar", FALSE, FALSE);
++  Config::writeEntry("_chkdispbar", TRUE, FALSE);
++
+   Config::writeEntry("_cmbspacekey", tr("入力モードに従う"), FALSE);
+   Config::writeEntry("_cmbtenkey", tr("入力モードに従う"), FALSE);
+   Config::writeEntry("_cmbtouten", tr(""), FALSE);
+@@ -418,16 +420,17 @@
+   Config::writeEntry("_cmbcmd", QString::null, FALSE);
+
+   // Saves default color table items
+-  const int setting = ST_KINPUT2;
++  //const int setting = ST_KINPUT2;
++  const int setting = ST_MSIME;
+   Config::writeEntry("_cmbloadcolor", setting, FALSE);
+   int i, j;
+   for (i = 0; i < NUM_ROWS; i++) {

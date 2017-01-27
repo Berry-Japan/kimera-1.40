@@ -1,0 +1,14 @@
+--- keyassigner.ui.h.orig	2006-04-06 20:39:03.000000000 +0900
++++ keyassigner.ui.h	2006-10-15 12:19:56.000000000 +0900
+@@ -446,8 +446,9 @@
+ 
+ void KeyAssigner::saveDefaultSetting()
+ {
+-  const int setting = ST_KINPUT2;
+-  for (int row = 0; row < MAX_AVAILABLE_KEYS; row++) {
++    //const int setting = ST_KINPUT2;
++    const int setting = ST_MSIME;
++    for (int row = 0; row < MAX_AVAILABLE_KEYS; row++) {
+     if ( KeyAssign[setting][row][0] ) {
+       for (int col = 0; col <= NUM_OF_CONVSTATUS; col++) {
+ 	Config::writeEntry(PREFIX + QString::number(row) + "-" + QString::number(col), KeyAssign[setting][row][col], FALSE);

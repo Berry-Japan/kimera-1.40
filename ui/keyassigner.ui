@@ -1,0 +1,302 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>KeyAssigner</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>KeyAssigner</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>750</width>
+            <height>360</height>
+        </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>5</hsizetype>
+            <vsizetype>5</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="minimumSize">
+        <size>
+            <width>700</width>
+            <height>260</height>
+        </size>
+    </property>
+    <property name="font">
+        <font>
+            <pointsize>10</pointsize>
+        </font>
+    </property>
+    <property name="caption">
+        <string>Key Assigner</string>
+    </property>
+    <widget class="QTable">
+        <column>
+            <property name="text">
+                <string>キー</string>
+            </property>
+        </column>
+        <column>
+            <property name="text">
+                <string>未入力</string>
+            </property>
+        </column>
+        <column>
+            <property name="text">
+                <string>入力中</string>
+            </property>
+        </column>
+        <column>
+            <property name="text">
+                <string>変換済み</string>
+            </property>
+        </column>
+        <column>
+            <property name="text">
+                <string>候補一覧表示中</string>
+            </property>
+        </column>
+        <column>
+            <property name="text">
+                <string>文節長変更中</string>
+            </property>
+        </column>
+        <property name="name">
+            <cstring>_keyassigntbl</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>50</y>
+                <width>730</width>
+                <height>230</height>
+            </rect>
+        </property>
+        <property name="sizePolicy">
+            <sizepolicy>
+                <hsizetype>5</hsizetype>
+                <vsizetype>5</vsizetype>
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+            </sizepolicy>
+        </property>
+        <property name="minimumSize">
+            <size>
+                <width>680</width>
+                <height>210</height>
+            </size>
+        </property>
+        <property name="font">
+            <font>
+            </font>
+        </property>
+        <property name="frameShape">
+            <enum>StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+            <enum>Sunken</enum>
+        </property>
+        <property name="lineWidth">
+            <number>0</number>
+        </property>
+        <property name="resizePolicy">
+            <enum>Default</enum>
+        </property>
+        <property name="vScrollBarMode">
+            <enum>AlwaysOn</enum>
+        </property>
+        <property name="hScrollBarMode">
+            <enum>AlwaysOff</enum>
+        </property>
+        <property name="numRows">
+            <number>10</number>
+        </property>
+        <property name="numCols">
+            <number>6</number>
+        </property>
+        <property name="readOnly">
+            <bool>true</bool>
+        </property>
+        <property name="selectionMode">
+            <enum>Single</enum>
+        </property>
+        <property name="focusStyle">
+            <enum>SpreadSheet</enum>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>_lblload</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>40</x>
+                <y>10</y>
+                <width>140</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property name="sizePolicy">
+            <sizepolicy>
+                <hsizetype>0</hsizetype>
+                <vsizetype>0</vsizetype>
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+            </sizepolicy>
+        </property>
+        <property name="minimumSize">
+            <size>
+                <width>140</width>
+                <height>30</height>
+            </size>
+        </property>
+        <property name="frameShape">
+            <enum>NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+            <enum>Plain</enum>
+        </property>
+        <property name="text">
+            <string>設定の読み込み：</string>
+        </property>
+    </widget>
+    <widget class="QComboBox">
+        <property name="name">
+            <cstring>_cmbloadsetting</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>180</x>
+                <y>10</y>
+                <width>160</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property name="sizePolicy">
+            <sizepolicy>
+                <hsizetype>0</hsizetype>
+                <vsizetype>0</vsizetype>
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+            </sizepolicy>
+        </property>
+        <property name="minimumSize">
+            <size>
+                <width>160</width>
+                <height>30</height>
+            </size>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>_okbtn</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>470</x>
+                <y>310</y>
+                <width>110</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property name="sizePolicy">
+            <sizepolicy>
+                <hsizetype>0</hsizetype>
+                <vsizetype>0</vsizetype>
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+            </sizepolicy>
+        </property>
+        <property name="minimumSize">
+            <size>
+                <width>110</width>
+                <height>30</height>
+            </size>
+        </property>
+        <property name="text">
+            <string>ＯＫ</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>_cancelbtn</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>600</x>
+                <y>310</y>
+                <width>110</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property name="sizePolicy">
+            <sizepolicy>
+                <hsizetype>0</hsizetype>
+                <vsizetype>0</vsizetype>
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+            </sizepolicy>
+        </property>
+        <property name="minimumSize">
+            <size>
+                <width>110</width>
+                <height>30</height>
+            </size>
+        </property>
+        <property name="text">
+            <string>キャンセル</string>
+        </property>
+    </widget>
+</widget>
+<connections>
+    <connection>
+        <sender>_okbtn</sender>
+        <signal>clicked()</signal>
+        <receiver>KeyAssigner</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>_cancelbtn</sender>
+        <signal>clicked()</signal>
+        <receiver>KeyAssigner</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>_cmbloadsetting</sender>
+        <signal>activated(int)</signal>
+        <receiver>KeyAssigner</receiver>
+        <slot>loadSetting(int)</slot>
+    </connection>
+</connections>
+<includes>
+    <include location="local" impldecl="in implementation">config.h</include>
+    <include location="global" impldecl="in implementation">qkeysequence.h</include>
+    <include location="local" impldecl="in declaration">kimeraglobal.h</include>
+    <include location="local" impldecl="in implementation">keyassigner.ui.h</include>
+</includes>
+<forwards>
+    <forward>using namespace Kimera;</forward>
+</forwards>
+<slots>
+    <slot>polish()</slot>
+    <slot access="protected" specifier="non virtual">saveSetting()</slot>
+    <slot access="protected" specifier="non virtual">loadSetting( int index )</slot>
+    <slot access="protected">accept()</slot>
+    <slot access="protected">reject()</slot>
+    <slot specifier="static">saveDefaultSetting()</slot>
+</slots>
+<functions>
+    <function specifier="non virtual">init()</function>
+    <function specifier="static" returnType="QString">functionName( FuncID id )</function>
+    <function specifier="static" returnType="FuncID">functionID( const QString &amp; func )</function>
+    <function specifier="static" returnType="FuncID">functionID( int key, ConvStatus stat )</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
